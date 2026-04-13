@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>prralla | Software Development Solutions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blue: #2B5A8C;
+            --blue-dark: #1E3F5F;
+            --green: #2E7D5A;
+            --green-dark: #1F5940;
+            --red: #B83232;
+            --red-dark: #8C2626;
+            --cream: #F5F0E8;
+            --cream-dark: #E8E0D0;
+            --charcoal: #1A1A1A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--blue);
+            color: var(--charcoal);
+            overflow-x: hidden;
+        }
+
+        /* Noise texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: linear-gradient(to bottom, rgba(43, 90, 140, 0.95), transparent);
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--cream);
+            letter-spacing: -0.02em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--cream);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.7;
+        }
+
+        .nav-cta {
+            background: var(--red);
+            color: var(--cream);
+            padding: 0.75rem 1.5rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s, background 0.3s;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            background: var(--red-dark);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            background: var(--blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 2rem;
+        }
+
+        .hero-frame {
+            position: relative;
+            padding: 3rem;
+            background: var(--green);
+            max-width: 900px;
+            width: 100%;
+            animation: frameIn 1s ease-out;
+        }
+
+        @keyframes frameIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .hero-inner {
+            background: var(--red);
+            padding: 3rem;
+        }
+
+        .hero-content {
+            background: var(--cream);
+            padding: 4rem;
+            text-align: center;
+            position: relative;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            background-blend-mode: multiply;
+        }
+
+        .hero-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: var(--blue);
+            margin-bottom: 1rem;
+            opacity: 0;
+            animation: fadeUp 0.8s ease-out 0.3s forwards;
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(4rem, 12vw, 8rem);
+            font-weight: 900;
+            color: var(--charcoal);
+            letter-spacing: -0.03em;
+            line-height: 0.9;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeUp 0.8s ease-out 0.5s forwards;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--charcoal);
+            max-width: 500px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.7;
+            opacity: 0;
+            animation: fadeUp 0.8s ease-out 0.7s forwards;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-cta-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            opacity: 0;
+            animation: fadeUp 0.8s ease-out 0.9s forwards;
+        }
+
+        .btn-primary {
+            background: var(--charcoal);
+            color: var(--cream);
+            padding: 1rem 2.5rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: var(--red);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--charcoal);
+            padding: 1rem 2.5rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border: 2px solid var(--charcoal);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--charcoal);
+            color: var(--cream);
+        }
+
+        /* Eagle decoration */
+        .eagle-icon {
+            position: absolute;
+            bottom: 2rem;
+            left: 2rem;
+            width: 60px;
+            height: 60px;
+            opacity: 0.3;
+        }
+
+        /* Services Section */
+        .services {
+            background: var(--cream);
+            padding: 8rem 4rem;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .section-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: var(--red);
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 900;
+            color: var(--charcoal);
+            letter-spacing: -0.02em;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .service-card {
+            background: white;
+            padding: 3rem 2rem;
+            border: 2px solid var(--charcoal);
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--green);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s;
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 12px 12px 0 var(--charcoal);
+        }
+
+        .service-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            font-weight: 900;
+            color: var(--cream-dark);
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        .service-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--charcoal);
+            margin-bottom: 1rem;
+        }
+
+        .service-desc {
+            color: #666;
+            line-height: 1.7;
+        }
+
+        /* About Section */
+        .about {
+            background: var(--green);
+            padding: 8rem 4rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .about {
+                grid-template-columns: 1fr;
+                padding: 4rem 2rem;
+            }
+        }
+
+        .about-visual {
+            position: relative;
+        }
+
+        .about-frame {
+            background: var(--blue);
+            padding: 2rem;
+            position: relative;
+        }
+
+        .about-frame-inner {
+            background: var(--red);
+            padding: 2rem;
+        }
+
+        .about-box {
+            background: var(--cream);
+            padding: 4rem;
+            text-align: center;
+        }
+
+        .about-stat {
+            font-family: 'Playfair Display', serif;
+            font-size: 5rem;
+            font-weight: 900;
+            color: var(--charcoal);
+            line-height: 1;
+        }
+
+        .about-stat-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--blue);
+            margin-top: 0.5rem;
+        }
+
+        .about-content h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 900;
+            color: var(--cream);
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .about-content p {
+            color: rgba(255,255,255,0.85);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .about-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .about-feature {
+            background: rgba(255,255,255,0.1);
+            padding: 0.75rem 1.25rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--cream);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Tech Stack */
+        .tech {
+            background: var(--charcoal);
+            padding: 6rem 4rem;
+            text-align: center;
+        }
+
+        .tech .section-label {
+            color: var(--green);
+        }
+
+        .tech .section-title {
+            color: var(--cream);
+            margin-bottom: 3rem;
+        }
+
+        .tech-logos {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .tech-item {
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            color: var(--cream);
+            opacity: 0.6;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 1rem 2rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s;
+        }
+
+        .tech-item:hover {
+            opacity: 1;
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        /* CTA Section */
+        .cta {
+            background: var(--red);
+            padding: 8rem 4rem;
+            text-align: center;
+        }
+
+        .cta h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            color: var(--cream);
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        .cta p {
+            color: rgba(255,255,255,0.85);
+            font-size: 1.2rem;
+            max-width: 500px;
+            margin: 0 auto 3rem;
+            line-height: 1.7;
+        }
+
+        .cta-btn {
+            background: var(--cream);
+            color: var(--charcoal);
+            padding: 1.25rem 3rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .cta-btn:hover {
+            background: var(--charcoal);
+            color: var(--cream);
+            transform: translateY(-3px);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--blue-dark);
+            padding: 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .footer-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--cream);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .footer-links a {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--cream);
+        }
+
+        .footer-copy {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Scroll animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem 2rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero-frame {
+                padding: 1.5rem;
+            }
+
+            .hero-inner {
+                padding: 1.5rem;
+            }
+
+            .hero-content {
+                padding: 2.5rem 1.5rem;
+            }
+
+            .services {
+                padding: 4rem 2rem;
+            }
+
+            .tech {
+                padding: 4rem 2rem;
+            }
+
+            .cta {
+                padding: 4rem 2rem;
+            }
+
+            footer {
+                padding: 2rem;
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">prralla</div>
+        <ul class="nav-links">
+            <li><a href="#services">Services</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#tech">Stack</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <button class="nav-cta">Start Project</button>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-frame">
+            <div class="hero-inner">
+                <div class="hero-content">
+                    <p class="hero-label">Software Development Solutions</p>
+                    <h1 class="hero-title">prralla</h1>
+                    <p class="hero-subtitle">We craft exceptional digital experiences through elegant code and thoughtful design. From concept to deployment, we build software that matters.</p>
+                    <div class="hero-cta-group">
+                        <button class="btn-primary">Get Started</button>
+                        <button class="btn-secondary">View Work</button>
+                    </div>
+                    <svg class="eagle-icon" viewBox="0 0 100 100" fill="currentColor">
+                        <path d="M50 15c-5 0-10 5-15 10-5-5-10-10-20-5 0 15 5 25 15 30-5 10-10 20-5 30 10-5 15-10 25-10s15 5 25 10c5-10 0-20-5-30 10-5 15-15 15-30-10-5-15 0-20 5-5-5-10-10-15-10z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="services" id="services">
+        <div class="section-header">
+            <p class="section-label">What We Do</p>
+            <h2 class="section-title">Services</h2>
+        </div>
+        <div class="services-grid">
+            <div class="service-card reveal">
+                <div class="service-number">01</div>
+                <h3 class="service-title">Web Development</h3>
+                <p class="service-desc">Modern, responsive web applications built with cutting-edge technologies. From single-page apps to complex enterprise systems.</p>
+            </div>
+            <div class="service-card reveal">
+                <div class="service-number">02</div>
+                <h3 class="service-title">Mobile Apps</h3>
+                <p class="service-desc">Native and cross-platform mobile experiences that users love. iOS, Android, and everything in between.</p>
+            </div>
+            <div class="service-card reveal">
+                <div class="service-number">03</div>
+                <h3 class="service-title">Cloud Solutions</h3>
+                <p class="service-desc">Scalable infrastructure and DevOps expertise. We architect systems that grow with your business.</p>
+            </div>
+            <div class="service-card reveal">
+                <div class="service-number">04</div>
+                <h3 class="service-title">AI Integration</h3>
+                <p class="service-desc">Intelligent solutions powered by machine learning. Transform your data into actionable insights.</p>
+            </div>
+            <div class="service-card reveal">
+                <div class="service-number">05</div>
+                <h3 class="service-title">UI/UX Design</h3>
+                <p class="service-desc">Human-centered design that delights. We create interfaces that are both beautiful and intuitive.</p>
+            </div>
+            <div class="service-card reveal">
+                <div class="service-number">06</div>
+                <h3 class="service-title">Consulting</h3>
+                <p class="service-desc">Strategic technology guidance for your digital transformation. Expert advice, practical results.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="about" id="about">
+        <div class="about-visual">
+            <div class="about-frame">
+                <div class="about-frame-inner">
+                    <div class="about-box">
+                        <div class="about-stat">150+</div>
+                        <div class="about-stat-label">Projects Delivered</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="about-content">
+            <h2>Building the future, one line of code at a time</h2>
+            <p>prralla is a team of passionate developers, designers, and strategists dedicated to creating exceptional software. We believe in clean code, thoughtful design, and meaningful results.</p>
+            <p>Founded on the principle that great software should be accessible to everyone, we partner with startups and enterprises alike to bring their visions to life.</p>
+            <div class="about-features">
+                <span class="about-feature">Agile</span>
+                <span class="about-feature">Transparent</span>
+                <span class="about-feature">Results-Driven</span>
+                <span class="about-feature">Innovative</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="tech" id="tech">
+        <div class="section-header">
+            <p class="section-label">Technologies</p>
+            <h2 class="section-title">Our Stack</h2>
+        </div>
+        <div class="tech-logos">
+            <div class="tech-item">React</div>
+            <div class="tech-item">Node.js</div>
+            <div class="tech-item">Python</div>
+            <div class="tech-item">AWS</div>
+            <div class="tech-item">TypeScript</div>
+            <div class="tech-item">PostgreSQL</div>
+            <div class="tech-item">Docker</div>
+            <div class="tech-item">Kubernetes</div>
+        </div>
+    </section>
+
+    <section class="cta" id="contact">
+        <h2>Ready to build something extraordinary?</h2>
+        <p>Let's discuss your next project and see how prralla can help bring your vision to life.</p>
+        <button class="cta-btn">Start a Conversation</button>
+    </section>
+
+    <footer>
+        <div class="footer-logo">prralla</div>
+        <ul class="footer-links">
+            <li><a href="#services">Services</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#tech">Stack</a></li>
+            <li><a href="#">Careers</a></li>
+        </ul>
+        <p class="footer-copy">© 2026 prralla. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Scroll reveal animation
+        const reveals = document.querySelectorAll('.reveal');
+        
+        const revealOnScroll = () => {
+            reveals.forEach(el => {
+                const windowHeight = window.innerHeight;
+                const revealTop = el.getBoundingClientRect().top;
+                const revealPoint = 150;
+                
+                if (revealTop < windowHeight - revealPoint) {
+                    el.classList.add('visible');
+                }
+            });
+        };
+        
+        window.addEventListener('scroll', revealOnScroll);
+        revealOnScroll(); // Initial check
+        
+        // Smooth scroll for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
